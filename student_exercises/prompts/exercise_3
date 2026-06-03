@@ -1,0 +1,28 @@
+================================================================================
+Exercise 3: Optimize Your CI/CD Pipeline
+================================================================================
+Step 1: 
+Create a basic GitHub Actions workflow for the already implemented full-stack application with frontend 
+(React) and backend (Flask). Include build, test, and deploy stages.
+
+Step 2: 
+Optimize an existing CI/CD pipeline for a web application. Add caching for 
+dependencies, parallel test execution, automated security scanning with SAST and 
+dependency checks, performance testing, blue-green deployment strategy, automated 
+rollback on failure, and monitoring integration. Use AI to identify bottlenecks 
+and suggest optimizations.
+
+Step 3:
+Analyze created GitHub Actions workflow and optimize it. Add dependency caching, 
+split tests into parallel jobs, add security scanning (Snyk, npm audit), implement 
+Docker layer caching, add deployment health checks, and set up Slack notifications 
+for failures. Target: reduce pipeline time by 50%.
+
+Tasks:
+- Implement caching for node_modules and pip packages
+- Configure parallel test execution (3+ jobs)
+- Add security scanning (SAST, dependency check)
+- Implement blue-green deployment
+- Add automated rollback on failure
+- Set up monitoring and alerting
+- Measure and document performance improvements

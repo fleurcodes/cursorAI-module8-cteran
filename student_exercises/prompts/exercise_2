@@ -1,0 +1,19 @@
+================================================================================
+Exercise 2: API Test Suite Generation
+================================================================================
+Objective: Generate automated API test suite for a REST API.
+
+Core Prompt:
+Generate a comprehensive API test suite for a REST API with endpoints for user 
+management, product catalog, and orders. Include tests for GET, POST, PUT, DELETE 
+operations. Test authentication, authorization, input validation, error responses, 
+rate limiting, and performance (response time under 500ms).
+
+Test Categories to Include:
+ - Authentication tests (valid/invalid tokens)
+ - Authorization tests (role-based access)
+ - CRUD operation tests
+ - Input validation tests
+ - Error handling tests (404, 400, 500)
+ - Performance tests (response time)
+ - Rate limiting tests

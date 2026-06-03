@@ -1,0 +1,44 @@
+================================================================================
+Exercise 1: Generate Test Cases for Team & Support Portal
+================================================================================
+
+Core Prompt:
+Generate comprehensive test cases for this repository’s **Team & Support Portal**:
+a React + TypeScript (Vite) front end with hash routes (`#/team`, `#/support`) and a
+Flask JWT API. Cover **team dashboard** flows (projects, tasks, project health status,
+members, notifications/activity feed, quick actions and modals) and **customer support**
+flows (ticket list/create, role-based access for `customer` / `agent` / `admin`,
+status transitions, admin metrics and agent assignment, SLA-related behavior where
+exposed, comments and attachments if applicable). Include **authentication** (register,
+login, protected routes, invalid/expired token handling). Include positive scenarios,
+negative scenarios, edge cases (empty project list, no tasks, rate limits on ticket
+creation), and security scenarios (JWT misuse, input sanitization on ticket subject/
+description and comments, IDOR or cross-user ticket access, SQL injection / XSS in
+user-supplied fields, support RBAC enforcement).
+
+
+Expected Deliverables:
+ - 30+ test cases across all categories
+ - Positive test cases (happy paths: login → team dashboard load; create/update task;
+   project status change; support ticket lifecycle for each relevant role)
+ - Negative test cases (API/UI errors, invalid transitions, validation failures,
+   unauthorized access without login or wrong support role)
+ - Edge cases (concurrent edits, pagination on ticket list, large descriptions within
+   limits, missing optional fields)
+ - Security test cases (authZ by role, token tampering, injection payloads in text
+   fields, safe handling of uploads if present)
+ - Automated test scripts aligned with this repo: **Playwright** E2E under `tests/`
+   (and optionally Flask **pytest** for critical API-only paths if you document how
+   to run them)
+ - Test data generation strategy (seed users, demo accounts from README, factories
+   for projects/tasks/tickets)
+
+
+Acceptance Criteria:
+ - All critical **#/team** and **#/support** user journeys covered for each role that
+   the UI exposes
+ - JWT-protected API behavior and support **RBAC** validated in tests or documented
+   manual checks
+ - Error handling and validation (forms, HTTP 4xx) explicitly tested
+ - Test scripts executable in this project (`npm test` / documented commands) and
+   passing where automation is in scope

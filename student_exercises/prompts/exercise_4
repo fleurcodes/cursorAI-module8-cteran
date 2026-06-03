@@ -1,0 +1,26 @@
+================================================================================
+Exercise 4: Build a Complete QA System
+================================================================================
+Objective: Implement a comprehensive QA automation system for the project.
+
+Core Prompt:
+Create a complete QA automation system with test automation framework using Page 
+Object Model, automated code quality checks with ESLint/Pylint, security scanning 
+with OWASP ZAP and Snyk, performance testing with k6, quality dashboard with metrics 
+visualization, and automated report generation. Include scripts to run all checks.
+
+Deliverables:
+ - Test automation framework (Page Object Model)
+ - Code quality automation (linting, complexity)
+ - Security scanning automation
+ - Performance testing scripts
+ - Quality dashboard (HTML report)
+ - Master execution script
+ - Documentation for running QA suite
+
+Quality Metrics to Track:
+ - Test coverage (target: 80%+)
+ - Code complexity (target: <10)
+ - Security vulnerabilities (target: 0 critical)
+ - Response time (target: <500ms)
+ - Error rate (target: <1%)
