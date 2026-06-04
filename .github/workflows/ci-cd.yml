@@ -1,5 +1,5 @@
 # Optimized CI/CD: caching, parallel tests, SAST, dependency audit, Docker layer cache,
-# blue/green smoke deploy with rollback, optional Slack + Snyk (see deliverable doc).
+# blue/green smoke deploy with rollback, optional Discord + Snyk (see deliverable doc).
 name: CI/CD
 
 on:
@@ -286,7 +286,7 @@ jobs:
           echo "**Promoted** new revision to active port 5000 (simulated switch)." >> "$GITHUB_STEP_SUMMARY"
 
   notify:
-    name: Slack / monitoring on failure
+    name: Discord / monitoring on failure
     runs-on: ubuntu-latest
     needs:
       - frontend-build
@@ -308,7 +308,7 @@ jobs:
           echo "- docker-images: ${{ needs.docker-images.result }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- snyk: ${{ needs.snyk.result }}" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Slack notification on failure
+      - name: Discord notification on failure
         if: >
           (needs.frontend-build.result == 'failure' ||
            needs.backend-test-shard.result == 'failure' ||
@@ -317,13 +317,13 @@ jobs:
            needs.docker-images.result == 'failure' ||
            (needs.snyk.result == 'failure' && vars.ENABLE_SNYK == 'true'))
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
-            echo "No SLACK_WEBHOOK_URL secret — skipping Slack (set secret to enable alerts)."
+          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
+            echo "No DISCORD_WEBHOOK_URL secret — skipping Discord (set secret to enable alerts)."
             exit 0
           fi
           payload=$(jq -n \
-            --arg text ":x: *${{ github.repository }}* workflow <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}> failed on \`${{ github.ref_name }}\` (${{ github.sha }})" \
-            '{text: $text}')
-          curl -sS -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK_URL"
+            --arg content "❌ **${{ github.repository }}** — **${{ github.workflow }}** failed on \`${{ github.ref_name }}\` (\`${{ github.sha }}\`)\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            '{content: $content}')
+          curl -sS -X POST -H 'Content-type: application/json' --data "$payload" "$DISCORD_WEBHOOK_URL"

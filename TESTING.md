@@ -130,7 +130,7 @@ Playwright will retry failing tests up to **2 times**, use **1 worker**, and sta
 
 ## GitHub Actions (Exercise 3)
 
-The repository includes an optimized pipeline (caching, parallel pytest + Playwright shards, security scans, Docker builds with layer cache, optional Slack/Snyk). See **[`student_exercises/deliverables/exercise_3_pipeline.md`](student_exercises/deliverables/exercise_3_pipeline.md)** and the workflow files under `.github/workflows/`.
+The repository includes an optimized pipeline (caching, parallel pytest + Playwright shards, security scans, Docker builds with layer cache, optional Discord/Snyk). See **[`student_exercises/deliverables/exercise_3_pipeline.md`](student_exercises/deliverables/exercise_3_pipeline.md)** and the workflow files under `.github/workflows/`.
 
 ---
 

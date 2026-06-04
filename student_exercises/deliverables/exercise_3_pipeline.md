@@ -24,14 +24,14 @@ Together with **parallel** test jobs, wall-clock time typically drops versus a s
 
 | Name | Purpose |
 | --- | --- |
-| `SLACK_WEBHOOK_URL` | Incoming webhook; on any required-job failure, a short message is posted (skipped if unset) |
+| `DISCORD_WEBHOOK_URL` | Server channel **Incoming Webhook** URL; on failure the workflow POSTs `{ "content": "..." }` (skipped if unset) |
 | `SNYK_TOKEN` + repo variable `ENABLE_SNYK=true` | Runs [`snyk/actions/node`](https://github.com/snyk/actions) (pinned tag in workflow) |
 
 ## Monitoring & alerting
 
 - **GitHub Step Summary**: bundle size (frontend), Bandit text, workflow job matrix results in the `notify` job
 - **Security tab**: CodeQL + Trivy SARIF (upload may be skipped for fork PRs)
-- **Slack**: failure webhook as above
+- **Discord**: failure webhook as above (Incoming Webhook integration in your server)
 
 ## Blue/green & rollback (scope)
 
