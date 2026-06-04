@@ -213,3 +213,35 @@ def test_priority_forbidden_for_customer(client):
         headers=auth_header(cust_tok),
     )
     assert r.status_code == 403
+
+
+def test_post_comment_multipart_with_pdf_attachment(client):
+    from io import BytesIO
+
+    adm_tok, _ = _reg(client, 'crud-mp-adm@example.com', 'admin')
+    cust_tok, _ = _reg(client, 'crud-mp-cust@example.com', 'customer')
+    tid = _create_ticket(client, cust_tok)
+    pdf = b'%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n'
+    data = {
+        'content': 'Agent comment with a PDF attachment body.',
+        'is_internal': 'false',
+        'files': (BytesIO(pdf), 'evidence.pdf'),
+    }
+    r = client.post(f'/api/tickets/{tid}/comments', data=data, headers=auth_header(adm_tok))
+    assert r.status_code == 201, r.get_json()
+
+
+def test_post_comment_rejects_bad_extension_attachment(client):
+    from io import BytesIO
+
+    adm_tok, _ = _reg(client, 'crud-badext-adm@example.com', 'admin')
+    cust_tok, _ = _reg(client, 'crud-badext-cust@example.com', 'customer')
+    tid = _create_ticket(client, cust_tok)
+    pdf = b'%PDF-1.4\n'
+    data = {
+        'content': 'Comment tries to masquerade as exe.',
+        'is_internal': 'false',
+        'files': (BytesIO(pdf), 'malware.exe'),
+    }
+    r = client.post(f'/api/tickets/{tid}/comments', data=data, headers=auth_header(adm_tok))
+    assert r.status_code == 400

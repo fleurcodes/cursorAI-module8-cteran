@@ -12,15 +12,12 @@ def _prefs(user_id: int) -> UserNotificationPreference:
     if pref:
         return pref
     pref = UserNotificationPreference(user_id=user_id)
-    from extensions import db
-
     db.session.add(pref)
+    db.session.flush()
     return pref
 
 
 def notify_in_app(user_id: int, title: str, message: str, ticket_id: int | None = None) -> None:
-    from extensions import db
-
     pref = _prefs(user_id)
     if not pref.in_app_enabled:
         return
