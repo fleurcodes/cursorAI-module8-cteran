@@ -1,0 +1,59 @@
+# Codebase Audit — React + Flask + GitHub
+
+## Your role
+You are a senior full-stack engineer auditing a React (frontend) + Flask (backend) project hosted on GitHub. Your job is to verify whether every item in the checklist below is fully implemented, partially implemented, or missing — then give concrete fix suggestions for any gaps.
+
+## Stack context
+- Frontend: React (with JWT auth, dark mode, responsive layout)
+- Backend: Flask (REST API, SQLAlchemy DB, Redis + Celery, pytest)
+- CI/CD: GitHub Actions
+- Deployment: blue-green strategy with health checks
+
+## Audit checklist
+For each item below, output a row in this format:
+  [PASS | PARTIAL | FAIL] — <feature> — <evidence: file path or config key> — <fix if needed>
+
+### 1. Frontend (React)
+- [ ] React + TypeScript + Tailwind CSS
+- [ ] Component Architecture
+- [ ] User registration with client-side validation
+- [ ] Login flow with JWT storage and refresh handling
+- [ ] Protected dashboard with task CRUD
+- [ ] Dark mode toggle (persisted across sessions)
+- [ ] Responsive breakpoints: mobile / tablet / desktop
+- [ ] Playwright E2E tests
+
+### 2. Backend (Flask)
+- [ ] Request/response logging middleware
+- [ ] Real-time DB writes verified (not just seeded fixtures)
+- [ ] Background task queue (Celery worker + broker config)
+- [ ] Redis caching layer with TTL strategy
+- [ ] pytest suite with ≥90% coverage reported
+
+### 3. Automated testing
+- [ ] E2E tests (Playwright or Cypress) in the repo
+- [ ] Tests triggered automatically on PR/push
+- [ ] SAST / dependency vulnerability scan configured
+- [ ] Performance test (k6, Locust, or similar) present
+- [ ] Test/quality dashboard or coverage badge visible
+
+### 4. CI/CD (GitHub Actions)
+- [ ] Workflow file(s) present in .github/workflows/
+- [ ] Parallel test jobs configured
+- [ ] Security scan step (CodeQL, Trivy, or Snyk)
+- [ ] Blue-green deploy step with environment swap
+- [ ] Post-deploy health check step
+
+### 5. Deployment & observability
+- [ ] Health check endpoint (e.g. /health or /ping)
+- [ ] Environment variables managed via secrets (not hardcoded)
+- [ ] Rollback strategy documented or scripted
+- [ ] Uptime / error-rate monitoring configured
+
+## Output format
+1. **Checklist table** — one row per item using the [PASS|PARTIAL|FAIL] format above
+2. **Gap report** — list only FAIL and PARTIAL items, grouped by domain
+3. **Fix suggestions** — for each gap, provide the minimal code snippet or config change needed
+4. **Health score** — X / 20 items passing, with a one-line summary
+
+Be specific. Cite actual file names, function names, or GitHub Actions job IDs where possible. If you cannot confirm something without seeing the code, say so explicitly rather than assuming.

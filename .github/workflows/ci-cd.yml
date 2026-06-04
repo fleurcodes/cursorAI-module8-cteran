@@ -263,7 +263,7 @@ jobs:
           echo "Starting active slot (blue) on port 5000..."
           docker run -d --name api-active -p 5000:5000 api:ci
           for i in $(seq 1 45); do
-            if curl -fsS "http://127.0.0.1:5000/" >/dev/null 2>&1; then echo "Active health OK"; break; fi
+            if curl -fsS "http://127.0.0.1:5000/health" >/dev/null 2>&1; then echo "Active health OK"; break; fi
             sleep 2
             if [ "$i" -eq 45 ]; then echo "Active slot failed to become healthy"; docker logs api-active; exit 1; fi
           done
@@ -271,7 +271,7 @@ jobs:
           docker run -d --name api-candidate -p 5001:5000 api:ci
           CANDIDATE_OK=0
           for i in $(seq 1 45); do
-            if curl -fsS "http://127.0.0.1:5001/" >/dev/null 2>&1; then CANDIDATE_OK=1; break; fi
+            if curl -fsS "http://127.0.0.1:5001/health" >/dev/null 2>&1; then CANDIDATE_OK=1; break; fi
             sleep 2
           done
           if [ "$CANDIDATE_OK" != "1" ]; then
@@ -288,7 +288,7 @@ jobs:
           docker run -d --name api-active -p 5000:5000 api:ci
           echo "Waiting for promoted instance on :5000..."
           for i in $(seq 1 45); do
-            if curl -fsS "http://127.0.0.1:5000/" >/dev/null 2>&1; then echo "Promoted slot health OK"; break; fi
+            if curl -fsS "http://127.0.0.1:5000/health" >/dev/null 2>&1; then echo "Promoted slot health OK"; break; fi
             sleep 2
             if [ "$i" -eq 45 ]; then echo "Promoted slot failed to become healthy"; docker logs api-active; exit 1; fi
           done

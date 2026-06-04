@@ -5,6 +5,7 @@ from flasgger import Swagger
 
 from config import Config
 from extensions import cache, db, jwt, limiter, ma, socketio
+from middleware.request_logging import init_request_logging
 from resources.auth import auth_bp
 from resources.notifications import notifications_bp
 from resources.projects import projects_bp
@@ -28,6 +29,7 @@ def create_app(test_config=None):
     socketio.init_app(app, cors_allowed_origins='*')
     cache.init_app(app)
     limiter.init_app(app)
+    init_request_logging(app)
 
     from celery_app import init_celery
 
@@ -73,6 +75,12 @@ def create_app(test_config=None):
     app.register_blueprint(support_tickets_bp)
     app.register_blueprint(support_agents_bp)
     app.register_blueprint(support_admin_bp)
+
+    @app.route('/health')
+    @app.route('/ping')
+    def health_check():
+        """Liveness probe for load balancers and CI deploy smoke tests."""
+        return jsonify({'status': 'ok'}), 200
 
     @app.errorhandler(400)
     def bad_request(error):

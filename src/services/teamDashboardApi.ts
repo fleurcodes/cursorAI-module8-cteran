@@ -1,9 +1,7 @@
-import { getAuthToken } from './authService';
+import { authorizedFetch, getAuthToken } from './authService';
 import type { Project, ProjectStatus } from '../components/types/project';
 import type { TeamMember, MemberRole, OnlineStatus } from '../components/types/team';
 import type { Activity, ActivityType } from '../components/types/activity';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
 export interface ApiProjectMember {
   user_id?: number | null;
@@ -78,14 +76,8 @@ async function apiJson<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!token) {
     throw new Error('Not authenticated');
   }
-  const url = `${API_BASE_URL}${path}`;
-  const headers: HeadersInit = {
-    Authorization: `Bearer ${token}`,
-    ...(init.body ? { 'Content-Type': 'application/json' } : {}),
-    ...(init.headers as Record<string, string> | undefined),
-  };
 
-  const res = await fetch(url, { ...init, headers });
+  const res = await authorizedFetch(path, init);
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {
     const message = typeof body.message === 'string' ? body.message : res.statusText;

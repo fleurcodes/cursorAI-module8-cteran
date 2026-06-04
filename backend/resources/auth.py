@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
 from extensions import db
@@ -72,7 +72,18 @@ def register():
     db.session.commit()
 
     access_token = create_access_token(identity=str(user.id))
-    return jsonify({'user': UserSchema().dump(user), 'access_token': access_token, 'message': 'Created'}), 201
+    refresh_token = create_refresh_token(identity=str(user.id))
+    return (
+        jsonify(
+            {
+                'user': UserSchema().dump(user),
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+                'message': 'Created',
+            }
+        ),
+        201,
+    )
 
 
 @auth_bp.route('/login', methods=['POST'])
@@ -115,4 +126,27 @@ def login():
         return jsonify({'message': 'Invalid credentials'}), 401
 
     access_token = create_access_token(identity=str(user.id))
-    return jsonify({'access_token': access_token, 'user': UserSchema().dump(user)}), 200
+    refresh_token = create_refresh_token(identity=str(user.id))
+    return jsonify({'access_token': access_token, 'refresh_token': refresh_token, 'user': UserSchema().dump(user)}), 200
+
+
+@auth_bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    """
+    Exchange a valid refresh JWT for a new access + refresh pair.
+    ---
+    tags:
+      - Authentication
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: New tokens issued
+      401:
+        description: Missing or invalid refresh token
+    """
+    user_id = get_jwt_identity()
+    access_token = create_access_token(identity=str(user_id))
+    refresh_token = create_refresh_token(identity=str(user_id))
+    return jsonify({'access_token': access_token, 'refresh_token': refresh_token}), 200

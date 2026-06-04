@@ -5,6 +5,13 @@ from __future__ import annotations
 from tests.conftest import auth_header, create_project, register_user
 
 
+def test_health_and_ping_return_ok(client):
+    for path in ('/health', '/ping'):
+        r = client.get(path)
+        assert r.status_code == 200
+        assert r.get_json().get('status') == 'ok'
+
+
 def test_register_returns_token_and_user(client):
     r = client.post(
         '/api/register',
@@ -19,6 +26,7 @@ def test_register_returns_token_and_user(client):
     assert r.status_code == 201, r.get_json()
     body = r.get_json()
     assert 'access_token' in body
+    assert 'refresh_token' in body
     assert body['user']['email'] == 'auth-user@example.com'
     assert body['user']['full_name'] == 'Auth User'
 
@@ -61,7 +69,33 @@ def test_login_success_returns_token(client):
         json={'email': 'login-ok@example.com', 'password': 'password123'},
     )
     assert r.status_code == 200, r.get_json()
-    assert 'access_token' in r.get_json()
+    body = r.get_json()
+    assert 'access_token' in body
+    assert 'refresh_token' in body
+
+
+def test_refresh_with_valid_refresh_token_returns_new_pair(client):
+    r = client.post(
+        '/api/register',
+        json={
+            'full_name': 'Refresh User',
+            'email': 'refresh-user@example.com',
+            'password': 'password123',
+            'support_role': 'none',
+        },
+    )
+    assert r.status_code == 201
+    refresh = r.get_json()['refresh_token']
+    r2 = client.post('/api/refresh', headers={'Authorization': f'Bearer {refresh}'})
+    assert r2.status_code == 200, r2.get_json()
+    out = r2.get_json()
+    assert 'access_token' in out and 'refresh_token' in out
+
+
+def test_refresh_with_access_token_rejected(client):
+    tok, _ = register_user(client, 'refresh-access-mix@example.com')
+    r = client.post('/api/refresh', headers=auth_header(tok))
+    assert r.status_code in (401, 422)
 
 
 def test_login_invalid_password_returns_401(client):
