@@ -14,6 +14,7 @@ class TicketCreateSchema(Schema):
         validate=validate.OneOf(['technical', 'billing', 'general', 'feature_request']),
     )
     customer_email = fields.Email(required=False, allow_none=True)
+    on_behalf_email = fields.Email(required=False, allow_none=True)
     auto_assign = fields.Bool(load_default=True)
 
     @validates('subject')

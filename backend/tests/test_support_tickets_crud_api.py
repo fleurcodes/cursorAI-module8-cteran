@@ -245,3 +245,73 @@ def test_post_comment_rejects_bad_extension_attachment(client):
     }
     r = client.post(f'/api/tickets/{tid}/comments', data=data, headers=auth_header(adm_tok))
     assert r.status_code == 400
+
+
+def test_post_comment_rejects_oversized_attachment(client):
+    from io import BytesIO
+
+    adm_tok, _ = _reg(client, 'crud-big-adm@example.com', 'admin')
+    cust_tok, _ = _reg(client, 'crud-big-cust@example.com', 'customer')
+    tid = _create_ticket(client, cust_tok)
+    big = b'Z' * (5 * 1024 * 1024 + 1)
+    data = {
+        'content': 'Comment with an oversized PDF attachment.',
+        'is_internal': 'false',
+        'files': (BytesIO(big), 'huge.pdf'),
+    }
+    r = client.post(f'/api/tickets/{tid}/comments', data=data, headers=auth_header(adm_tok))
+    assert r.status_code == 400
+    err = r.get_json()
+    assert 'files' in err.get('errors', err)
+
+
+def test_post_comment_rejects_pdf_mime_mismatch(client):
+    from io import BytesIO
+
+    adm_tok, _ = _reg(client, 'crud-mime-adm@example.com', 'admin')
+    cust_tok, _ = _reg(client, 'crud-mime-cust@example.com', 'customer')
+    tid = _create_ticket(client, cust_tok)
+    # JPEG magic bytes with a .pdf filename → sniffed type is not PDF
+    jpeg_like = b'\xff\xd8\xff\xe0' + b'\x00' * 200
+    data = {
+        'content': 'Comment with JPEG content disguised as PDF.',
+        'is_internal': 'false',
+        'files': (BytesIO(jpeg_like), 'disguised.pdf'),
+    }
+    r = client.post(f'/api/tickets/{tid}/comments', data=data, headers=auth_header(adm_tok))
+    assert r.status_code == 400
+
+
+def test_admin_create_ticket_on_behalf_and_unknown_email(client):
+    adm_tok, _ = _reg(client, 'crud-ob-adm@example.com', 'admin')
+    _cust_tok, cust_id = _reg(client, 'crud-ob-cust@example.com', 'customer')
+
+    r_ok = client.post(
+        '/api/tickets',
+        json={
+            'subject': 'On behalf ticket subject ok',
+            'description': 'Long enough description for on-behalf creation.',
+            'priority': 'low',
+            'category': 'general',
+            'auto_assign': False,
+            'on_behalf_email': 'crud-ob-cust@example.com',
+        },
+        headers=auth_header(adm_tok),
+    )
+    assert r_ok.status_code == 201, r_ok.get_json()
+    ticket = r_ok.get_json()['ticket']
+    assert ticket['customer']['id'] == cust_id
+
+    r_bad = client.post(
+        '/api/tickets',
+        json={
+            'subject': 'On behalf missing user subj',
+            'description': 'Long enough description for validation failure path.',
+            'priority': 'low',
+            'category': 'general',
+            'auto_assign': False,
+            'on_behalf_email': 'no-such-user-ob@example.com',
+        },
+        headers=auth_header(adm_tok),
+    )
+    assert r_bad.status_code == 400

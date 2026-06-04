@@ -347,6 +347,7 @@ def create_ticket():
             'priority': form.get('priority', 'medium'),
             'category': form.get('category', 'general'),
             'customer_email': form.get('customer_email'),
+            'on_behalf_email': form.get('on_behalf_email'),
             'auto_assign': form.get('auto_assign', 'true').lower() in ('1', 'true', 'yes'),
         }
     else:
@@ -362,7 +363,7 @@ def create_ticket():
     customer_id = user.id
     customer_email = (payload.get('customer_email') or user.email).strip().lower()
     if user.support_role == 'admin':
-        ob = (request.get_json(silent=True) or {}).get('on_behalf_email') or request.form.get('on_behalf_email')
+        ob = payload.get('on_behalf_email')
         if ob:
             other = User.query.filter_by(email=str(ob).strip().lower()).first()
             if not other:

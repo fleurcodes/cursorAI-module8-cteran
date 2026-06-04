@@ -27,7 +27,7 @@ This document implements the checklist from the module **integration / full-stac
 | **PASS** | Real-time DB writes verified (not only seeded fixtures) | `backend/tests/test_tasks_api.py`, `test_auth.py`, `conftest.py` (`register_user`, `create_project`) create rows via API + SQLAlchemy | — |
 | **PASS** | Background task queue (Celery worker + broker config) | `backend/celery_app.py`, `backend/jobs.py`, `backend/config.py` (`CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`) | — |
 | **PARTIAL** | Redis caching layer with TTL strategy | `backend/config.py` (`REDIS_URL` → `CACHE_TYPE = 'RedisCache'`, `CACHE_DEFAULT_TIMEOUT`); `docker-compose.yml` + [RUNNING.md](../RUNNING.md) document local Redis | In production set `REDIS_URL` and run Redis. |
-| **PARTIAL** | pytest suite with ≥90% coverage reported | Full-suite **line+branch** coverage is **~80%** (`pytest tests/`); enforced floor **`--cov-fail-under=76`** in `backend/pytest.ini`; CI uploads `coverage.xml`. New tests: `test_email_service_unit.py`, `test_support_notify_unit.py`, `test_support_tickets_crud_api.py` (incl. multipart), `test_ticket_logic_unit.py`. | Push past **90%** with remaining admin/support edge routes and rare SLA branches. |
+| **PARTIAL** | pytest suite with ≥90% coverage reported | Full-suite **line+branch** coverage is **~82%** (`pytest tests/`); enforced floor **`--cov-fail-under=78`** in `backend/pytest.ini`; CI uploads `coverage.xml`. Tests include `test_support_admin_export_api.py`, `test_email_service_unit.py`, `test_support_notify_unit.py`, `test_support_tickets_crud_api.py` (incl. multipart / upload limits), `test_ticket_logic_unit.py`. | Push past **90%** with remaining support-agent routes and rare SLA branches. |
 
 ### Automated testing
 
@@ -65,7 +65,7 @@ This document implements the checklist from the module **integration / full-stac
 ### Backend
 
 - **PARTIAL** — Redis cache until `REDIS_URL` is set in the runtime environment.
-- **PARTIAL** — Stretch goal **90%** line coverage vs current **~80%** and enforced floor **76%**.
+- **PARTIAL** — Stretch goal **90%** line coverage vs current **~82%** and enforced floor **78%**.
 
 ### Automated testing
 
@@ -92,7 +92,7 @@ This document implements the checklist from the module **integration / full-stac
 
 **26 / 28** checklist rows **PASS**, **2 PARTIAL**, **0 FAIL**.
 
-**Summary:** Backend coverage is **~80%** with a **76%** CI/local gate; email stub/SMTP paths, notification prefs, SLA hooks, ticket CRUD (including multipart comments), and `ticket_logic` are covered. Remaining gap is mostly **stretch 90%** polish and optional **external uptime** tooling.
+**Summary:** Backend coverage is **~82%** with a **78%** CI/local gate; admin export/users routes, email stub/SMTP paths, notification prefs, SLA hooks, ticket CRUD (including multipart, MIME/size checks, admin on-behalf), and `ticket_logic` are covered. Remaining gap is mostly **stretch 90%** polish and optional **external uptime** tooling.
 
 ---
 

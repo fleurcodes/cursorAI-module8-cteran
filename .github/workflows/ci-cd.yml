@@ -60,7 +60,7 @@ jobs:
           - shard: 1
             paths: tests/test_auth.py tests/test_validation.py tests/test_task_cache.py tests/test_email_service_unit.py tests/test_support_notify_unit.py
           - shard: 2
-            paths: tests/test_support_api.py tests/test_tasks_api.py tests/test_breadth_api.py tests/test_production_secrets.py tests/test_support_tickets_crud_api.py tests/test_ticket_logic_unit.py
+            paths: tests/test_support_api.py tests/test_tasks_api.py tests/test_breadth_api.py tests/test_production_secrets.py tests/test_support_tickets_crud_api.py tests/test_support_admin_export_api.py tests/test_ticket_logic_unit.py
           - shard: 3
             paths: tests/test_performance.py tests/test_api_exercise_2_suite.py
 
