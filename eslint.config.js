@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'test-results', 'playwright-report', 'qa-artifacts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -17,6 +17,10 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
+    },
+    rules: {
+      /** QA target: cyclomatic complexity under 10 (Exercise 4) */
+      complexity: ['warn', 10],
     },
   },
 ])

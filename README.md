@@ -85,3 +85,7 @@ See **[RUNNING.md](RUNNING.md)** for prerequisites, Python venv, starting the AP
 ## Testing
 
 See **[TESTING.md](TESTING.md)** for Playwright commands and reports.
+
+## QA automation (Exercise 4)
+
+See **[QA.md](QA.md)** for the full QA suite: master script (`npm run qa:all`), Page Object Model layout, ESLint/Pylint, k6, ZAP, Snyk, and the HTML quality dashboard.

@@ -4,6 +4,7 @@
 
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
+import { SupportPortalPage } from '../pages/SupportPortalPage';
 import { installSupportCenterMocks } from './helpers/portalMocks';
 import { defaultRegisteredUser } from './helpers/apiFixtures';
 
@@ -16,8 +17,9 @@ test.describe('Support center — RBAC and flows (mocked API)', () => {
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
 
-    await page.getByRole('link', { name: 'Support' }).click();
-    await expect(page.getByRole('heading', { name: 'Customer support' })).toBeVisible({ timeout: 15_000 });
+    const support = new SupportPortalPage(page);
+    await support.openFromNav();
+    await support.expectSupportPortalVisible();
     await expect(page.getByText('Sample ticket')).toBeVisible();
     await expect(page.getByRole('combobox', { name: /Status for TKT-/i })).toHaveCount(0);
   });
@@ -29,9 +31,11 @@ test.describe('Support center — RBAC and flows (mocked API)', () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
-    await page.getByRole('link', { name: 'Support' }).click();
 
-    const statusBox = page.getByRole('combobox', { name: /Status for TKT-00001/i });
+    const support = new SupportPortalPage(page);
+    await support.openFromNav();
+
+    const statusBox = support.statusComboboxForTicket(/Status for TKT-00001/i);
     await expect(statusBox).toBeVisible({ timeout: 15_000 });
     await statusBox.selectOption('assigned');
     await expect(statusBox).toHaveValue('assigned');
@@ -44,15 +48,17 @@ test.describe('Support center — RBAC and flows (mocked API)', () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
-    await page.getByRole('link', { name: 'Support' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Admin dashboard' })).toBeVisible({ timeout: 15_000 });
+    const support = new SupportPortalPage(page);
+    await support.openFromNav();
+
+    await support.expectAdminDashboardVisible();
     await expect(page.getByText('Total', { exact: true })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Assign' }).click();
+    await support.assignButton().click();
     await page.getByRole('button', { name: 'Agent Seven' }).click();
 
-    await expect(page.getByRole('combobox', { name: /Status for TKT-00001/i })).toHaveValue('assigned');
+    await expect(support.statusComboboxForTicket(/Status for TKT-00001/i)).toHaveValue('assigned');
   });
 
   test('creates a ticket and shows it in the table', async ({ page }) => {
@@ -62,13 +68,15 @@ test.describe('Support center — RBAC and flows (mocked API)', () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
-    await page.getByRole('link', { name: 'Support' }).click();
 
-    await page.locator('#support-ticket-subject').fill('Billing question about invoice');
-    await page.locator('#support-ticket-description').fill(
+    const support = new SupportPortalPage(page);
+    await support.openFromNav();
+
+    await support.ticketSubjectInput().fill('Billing question about invoice');
+    await support.ticketDescriptionInput().fill(
       'I need help reconciling line items on my June invoice. Please advise.',
     );
-    await page.getByRole('button', { name: 'Submit ticket' }).click();
+    await support.submitTicketButton().click();
 
     await expect(page.getByText('Billing question about invoice')).toBeVisible({ timeout: 10_000 });
   });
@@ -80,10 +88,12 @@ test.describe('Support center — RBAC and flows (mocked API)', () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
-    await page.getByRole('link', { name: 'Support' }).click();
+
+    const support = new SupportPortalPage(page);
+    await support.openFromNav();
 
     await expect(page.getByText('Sample ticket')).toBeVisible({ timeout: 15_000 });
-    await page.getByRole('button', { name: 'Refresh' }).click();
+    await support.refreshButton().click();
     await expect(page.getByText('Sample ticket')).toBeVisible();
   });
 
@@ -103,9 +113,11 @@ test.describe('Support center — RBAC and flows (mocked API)', () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
-    await page.getByRole('link', { name: 'Support' }).click();
 
-    const statusBox = page.getByRole('combobox', { name: /Status for TKT-00001/i });
+    const support = new SupportPortalPage(page);
+    await support.openFromNav();
+
+    const statusBox = support.statusComboboxForTicket(/Status for TKT-00001/i);
     await expect(statusBox).toBeVisible({ timeout: 15_000 });
     await statusBox.selectOption('assigned');
 

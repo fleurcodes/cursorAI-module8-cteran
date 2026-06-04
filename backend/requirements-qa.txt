@@ -1,0 +1,3 @@
+# Optional QA-only tools (install on top of requirements.txt).
+-r requirements.txt
+pylint>=3.0

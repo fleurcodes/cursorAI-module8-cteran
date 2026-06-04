@@ -1,15 +1,12 @@
 [run]
-source = .
+branch = true
 omit =
-    tests/*
     .venv/*
-    seed_support.py
+    */.venv/*
+    tests/*
 
 [report]
-precision = 1
-include =
-    resources/tasks.py
-    jobs.py
-    services/task_cache.py
-    celery_app.py
-    config.py
+omit =
+    .venv/*
+    */.venv/*
+    tests/*

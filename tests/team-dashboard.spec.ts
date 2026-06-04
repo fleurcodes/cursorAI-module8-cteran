@@ -4,6 +4,7 @@
 
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
+import { TeamDashboardPage } from '../pages/TeamDashboardPage';
 import { installLoginAndTeamDashboardMocks, makeSampleProject } from './helpers/portalMocks';
 import { defaultRegisteredUser } from './helpers/apiFixtures';
 
@@ -19,12 +20,13 @@ test.describe('Team dashboard (mocked API)', () => {
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
 
-    await expect(page.getByRole('heading', { name: 'Team Dashboard' })).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: 'Alpha Portal' }).first()).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Project tasks' })).toBeVisible();
+    const team = new TeamDashboardPage(page);
+    await team.expectLoaded();
+    await team.expectProjectCardVisible('Alpha Portal');
+    await expect(team.projectTasksHeading()).toBeVisible();
     await expect(page.getByText('Wire Playwright mocks').first()).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'New Task' })).toBeVisible();
+    await expect(team.recentActivityHeading()).toBeVisible();
+    await expect(team.newTaskButton()).toBeVisible();
   });
 
   test('updates project status via PATCH and reloads summary', async ({ page }) => {
@@ -38,9 +40,10 @@ test.describe('Team dashboard (mocked API)', () => {
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
 
-    await expect(page.getByRole('heading', { name: 'Team Dashboard' })).toBeVisible({ timeout: 15_000 });
+    const team = new TeamDashboardPage(page);
+    await team.expectLoaded();
 
-    const projectStatus = page.locator('#project-status-select');
+    const projectStatus = team.projectStatusSelect();
     await projectStatus.selectOption('at-risk');
 
     await expect(projectStatus).toHaveValue('at-risk');
@@ -60,7 +63,8 @@ test.describe('Team dashboard (mocked API)', () => {
 
     await expect(page.getByText('Wire Playwright mocks').first()).toBeVisible({ timeout: 15_000 });
 
-    const taskSelect = page.locator('#task-status-501');
+    const team = new TeamDashboardPage(page);
+    const taskSelect = team.taskStatusSelect(501);
     await taskSelect.selectOption('in-progress');
 
     await expect(taskSelect).toHaveValue('in-progress');
@@ -85,8 +89,9 @@ test.describe('Team dashboard (mocked API)', () => {
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
 
-    await expect(page.getByRole('button', { name: 'Project One' })).toBeVisible({ timeout: 15_000 });
-    await page.getByRole('button', { name: 'Project Two' }).click();
+    const team = new TeamDashboardPage(page);
+    await expect(team.projectButton('Project One')).toBeVisible({ timeout: 15_000 });
+    await team.projectButton('Project Two').click();
     await expect(page.getByText('Second board task', { exact: true }).first()).toBeVisible();
   });
 });

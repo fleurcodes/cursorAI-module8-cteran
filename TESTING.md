@@ -100,6 +100,8 @@ npx playwright test --headed
 |---|---|
 | `pages/RegistrationPage.ts` | Page object for the multi-step registration form |
 | `pages/LoginPage.ts` | Page object for `#/login` |
+| `pages/TeamDashboardPage.ts` | Page object for `#/team` (Exercise 4) |
+| `pages/SupportPortalPage.ts` | Page object for `#/support` (Exercise 4) |
 | `tests/helpers/formHelpers.ts` | Valid sample data and boundary strings |
 | `tests/helpers/apiFixtures.ts` | Mock JWT/register responses and empty team-dashboard API payloads |
 | `tests/helpers/portalMocks.ts` | Stateful mocks for richer team projects/tasks and support ticket/admin APIs (Exercise 1) |
@@ -136,4 +138,10 @@ The repository includes an optimized pipeline (caching, parallel pytest + Playwr
 
 ## Configuration Reference
 
-See [`playwright.config.ts`](playwright.config.ts): base URL `http://localhost:5173`, test dir `./tests`, web server `npm run dev`.
+See [`playwright.config.ts`](playwright.config.ts): base URL `http://localhost:5173`, test dir `./tests`, web server `npm run dev`. Set `QA_JSON_REPORT=/path/to/playwright-results.json` to also emit JSON for the QA dashboard ([QA.md](QA.md)).
+
+---
+
+## QA suite (Exercise 4)
+
+End-to-end automation, linting, coverage, k6, ZAP, Snyk, and the HTML metrics dashboard are documented in **[QA.md](QA.md)** (`npm run qa:all`).

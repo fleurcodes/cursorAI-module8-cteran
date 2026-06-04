@@ -1,1 +1,5 @@
 node_modules
+qa-artifacts/
+playwright-report/
+test-results/
+dist/
