@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from flask import Flask, jsonify
@@ -17,11 +18,33 @@ from resources.user import user_bp
 from review_accounts import ensure_review_accounts
 
 
+def _enforce_production_secrets(app: Flask) -> None:
+    """Refuse to boot in production with known-insecure defaults (see docs/CODEBASE_AUDIT_INTEGRATION.md)."""
+    if app.config.get('TESTING'):
+        return
+    env = (os.environ.get('FLASK_ENV') or '').lower()
+    app_env = (os.environ.get('APP_ENV') or '').lower()
+    if env != 'production' and app_env != 'production':
+        return
+    bad: list[str] = []
+    if app.config.get('SECRET_KEY') == 'change-me-123':
+        bad.append('SECRET_KEY')
+    if app.config.get('JWT_SECRET_KEY') == 'jwt-change-me':
+        bad.append('JWT_SECRET_KEY')
+    if bad:
+        raise RuntimeError(
+            'Refusing to start in production with insecure defaults: '
+            + ', '.join(bad)
+            + '. Set strong values via environment variables (see RUNNING.md).'
+        )
+
+
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.from_object(Config)
     if test_config:
         app.config.update(test_config)
+    _enforce_production_secrets(app)
 
     db.init_app(app)
     ma.init_app(app)
@@ -117,6 +140,7 @@ def create_app(test_config=None):
         """
         return {
             'message': 'CursorAI backend is running',
+            'health': '/health',
             'swagger': '/apidocs/',
             'register': '/api/register',
             'login': '/api/login',

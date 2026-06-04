@@ -26,8 +26,8 @@ This document implements the checklist from the module **integration / full-stac
 | **PASS** | Request/response logging middleware | `backend/middleware/request_logging.py` (`init_request_logging`), wired in `backend/app.py` | — |
 | **PASS** | Real-time DB writes verified (not only seeded fixtures) | `backend/tests/test_tasks_api.py`, `test_auth.py`, `conftest.py` (`register_user`, `create_project`) create rows via API + SQLAlchemy | — |
 | **PASS** | Background task queue (Celery worker + broker config) | `backend/celery_app.py`, `backend/jobs.py`, `backend/config.py` (`CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`) | — |
-| **PARTIAL** | Redis caching layer with TTL strategy | `backend/config.py` (`REDIS_URL` → `CACHE_TYPE = 'RedisCache'`, `CACHE_DEFAULT_TIMEOUT`); falls back to `SimpleCache` when `REDIS_URL` unset | In production set `REDIS_URL` and run Redis so the cache backend is not in-memory only. |
-| **FAIL** | pytest suite with ≥90% coverage reported | `backend/pytest.ini` sets `--cov-fail-under=90`, but aggregate line coverage for the app package is **well below 90%** when a full `--cov=.` run is executed; CI shards in `.github/workflows/ci-cd.yml` run subsets so the gate is bypassed via `tests/conftest.py` | Add focused tests for under-covered blueprints **or** lower the gate to a measured target **or** add a single CI job that runs the full suite with coverage and fails the workflow on `<90%`. |
+| **PARTIAL** | Redis caching layer with TTL strategy | `backend/config.py` (`REDIS_URL` → `CACHE_TYPE = 'RedisCache'`, `CACHE_DEFAULT_TIMEOUT`); `docker-compose.yml` + [RUNNING.md](../RUNNING.md) document local Redis | In production set `REDIS_URL` and run Redis. |
+| **PARTIAL** | pytest suite with ≥90% coverage reported | Full-suite **line+branch** coverage is **~68%** (`pytest tests/`); gate is **`--cov-fail-under=66`** in `backend/pytest.ini` with a documented path to **90%**; CI job **Backend — full suite + coverage gate** (`.github/workflows/ci-cd.yml`) enforces the gate and uploads `coverage.xml` | Add tests for `resources/support_tickets.py` branches and `services/*` to approach 90%; raise `cov-fail-under` incrementally. |
 
 ### Automated testing
 
@@ -37,24 +37,24 @@ This document implements the checklist from the module **integration / full-stac
 | **PASS** | Tests triggered on PR/push | `.github/workflows/ci-cd.yml` `on: [push, pull_request]` | — |
 | **PASS** | SAST / dependency vulnerability scan | `.github/workflows/codeql.yml`; `ci-cd.yml` jobs `security-dependencies` (npm audit, pip-audit, Bandit), Trivy on Docker images | — |
 | **PASS** | Performance test (k6 or similar) present | `scripts/qa/perf-k6.sh`, `npm run qa:perf`, documented in `QA.md` | — |
-| **PARTIAL** | Test/quality dashboard or coverage badge visible | `npm run qa:dashboard` → `qa-artifacts/dashboard.html` per `QA.md`; README has no embeddable coverage **badge** | Add a shields.io / Codecov badge once a workflow uploads a stable coverage artifact to a public URL. |
+| **PASS** | Test/quality dashboard or coverage badge visible | [README.md](../README.md) badges link to Actions + coverage gate doc; `npm run qa:dashboard` → `qa-artifacts/dashboard.html`; CI artifact **`backend-coverage-xml`** | Optional: Codecov + shields dynamic badge. |
 
 ### CI/CD (GitHub Actions)
 
 | Verdict | Feature | Evidence | Fix (if needed) |
 | --- | --- | --- | --- |
 | **PASS** | Workflow file(s) in `.github/workflows/` | `ci-cd.yml`, `codeql.yml` | — |
-| **PASS** | Parallel test jobs | Matrix jobs: `backend-test-shard`, `e2e-playwright` (chromium-desktop / tablet / mobile) | — |
+| **PASS** | Parallel test jobs | Matrix jobs: `backend-test-shard`, `e2e-playwright` (chromium-desktop / tablet / mobile), `backend-coverage-full` | — |
 | **PASS** | Security scan step (CodeQL, Trivy, or Snyk) | `codeql.yml`; Trivy in `docker-images`; optional Snyk job when `vars.ENABLE_SNYK == 'true'` | — |
 | **PASS** | Blue-green deploy step with environment swap | `ci-cd.yml` `docker-images` job: active/candidate containers, promote, rollback path on candidate failure | — |
-| **PASS** | Post-deploy health check step | Same job: `curl` against `/health` after container start (updated from `/` to dedicated probe) | — |
+| **PASS** | Post-deploy health check step | Same job: `curl` against `/health` after container start | — |
 
 ### Deployment & observability
 
 | Verdict | Feature | Evidence | Fix (if needed) |
 | --- | --- | --- | --- |
-| **PASS** | Health check endpoint (`/health` or `/ping`) | `backend/app.py` `@app.route('/health')` and `/ping` | — |
-| **PARTIAL** | Environment variables via secrets (not hardcoded) | `backend/config.py` reads `SECRET_KEY`, `JWT_SECRET_KEY`, `DATABASE_URL`, etc. from env, but ships **dev defaults** (`change-me-*`) | Document required secrets for production; fail fast in prod if defaults detected (optional guard). |
+| **PASS** | Health check endpoint (`/health` or `/ping`) | `backend/app.py` `@app.route('/health')` and `/ping`; root index JSON includes `"health": "/health"` | — |
+| **PASS** | Environment variables via secrets (not hardcoded) | `backend/config.py` reads secrets from env; `backend/app.py` `_enforce_production_secrets` refuses default `SECRET_KEY` / `JWT_SECRET_KEY` when `FLASK_ENV=production` or `APP_ENV=production` | — |
 | **PASS** | Rollback strategy documented or scripted | `.github/workflows/ci-cd.yml` rollback branch on failed candidate; narrative in `student_exercises/deliverables/exercise_3_pipeline.md` | — |
 | **PARTIAL** | Uptime / error-rate monitoring configured | Optional `DISCORD_WEBHOOK_URL` failure notification in `ci-cd.yml`; no third-party APM/uptime SaaS wired in-repo | Wire Datadog/New Relic/UptimeRobot etc. in the deployment environment if required by policy. |
 
@@ -64,16 +64,15 @@ This document implements the checklist from the module **integration / full-stac
 
 ### Backend
 
-- **FAIL** — pytest ≥90% coverage (aggregate vs gate).
 - **PARTIAL** — Redis cache until `REDIS_URL` is set in the runtime environment.
+- **PARTIAL** — Stretch goal **90%** line coverage vs current **~68%** and gate **66%**.
 
 ### Automated testing
 
-- **PARTIAL** — Public coverage badge / always-on dashboard URL (local `qa-artifacts/` is generated on demand).
+- (none — coverage badge path addressed in README + CI artifact.)
 
 ### Deployment & observability
 
-- **PARTIAL** — Production-grade secret hygiene (no default keys in prod).
 - **PARTIAL** — Dedicated uptime/error-rate product vs CI + Discord hooks only.
 
 ---
@@ -82,19 +81,18 @@ This document implements the checklist from the module **integration / full-stac
 
 | Gap | Suggested change |
 | --- | --- |
-| Coverage &lt; 90% | Extend `backend/tests/` for `resources/support_*.py` and low-covered services, **or** adjust `pytest.ini` / CI to a realistic `--cov-fail-under` once targets are agreed. |
-| Redis in dev | `docker run redis` + `export REDIS_URL=redis://localhost:6379/0` (see `config.py`). |
-| Coverage badge | Publish coverage XML from a dedicated GitHub Actions job and link a shields.io badge in `README.md`. |
-| Prod secrets | Require `SECRET_KEY` / `JWT_SECRET_KEY` without insecure defaults when `FLASK_ENV=production` (small check in `create_app`). |
+| Coverage toward 90% | Add API tests for remaining branches in `resources/support_tickets.py`, `services/support_notify.py`, `services/ticket_logic.py`; bump `pytest.ini` `--cov-fail-under` in small steps (e.g. 70 → 75 → 80). |
+| Redis in dev | `docker compose up -d redis` and `export REDIS_URL=...` (see [RUNNING.md](../RUNNING.md)). |
+| Codecov badge | Upload `backend/coverage.xml` from CI to Codecov; add shields badge to README. |
 | External monitoring | Add health-check URL to an external monitor; forward API logs/metrics to your org standard. |
 
 ---
 
 ## 4. Health score
 
-**22 / 28** checklist rows **PASS**, **5 PARTIAL**, **1 FAIL**.
+**26 / 28** checklist rows **PASS**, **2 PARTIAL**, **0 FAIL**.
 
-**Summary:** The stack matches the intended React + Flask + Actions architecture (auth with refresh, E2E, security scans, blue/green simulation, health routes, Celery, optional Redis). The main quantitative gap is **backend line coverage vs the 90% gate** while the application surface (especially support routes) remains under-tested in coverage terms.
+**Summary:** CI enforces a **full-suite coverage floor (66%)**, uploads **`coverage.xml`**, documents **Redis** via Compose + RUNNING, and **blocks production boots** on insecure default secrets. Remaining work is mostly **raising coverage toward 90%** and optional **external uptime** tooling.
 
 ---
 

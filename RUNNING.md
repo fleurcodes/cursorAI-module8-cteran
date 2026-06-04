@@ -52,6 +52,21 @@ pip install -r requirements.txt
 
 The API uses **SQLite** at `backend/data.db` by default (created when the app starts). Override with a `DATABASE_URL` environment variable if needed (see `backend/config.py`).
 
+### Optional: Redis (cache + Celery broker)
+
+When `REDIS_URL` is set, Flask-Caching uses **Redis** and Celery defaults to the same broker (see `backend/config.py`). Without it, the API uses in-memory cache and still points Celery at `redis://localhost:6379/0` for a real worker.
+
+From the **repository root**, start Redis with Docker Compose:
+
+```bash
+docker compose up -d redis
+export REDIS_URL=redis://127.0.0.1:6379/0
+export CELERY_BROKER_URL=redis://127.0.0.1:6379/0
+export CELERY_RESULT_BACKEND=redis://127.0.0.1:6379/1
+```
+
+Then start the API as usual. In **production**, set `FLASK_ENV=production` (or `APP_ENV=production`) and provide non-default **`SECRET_KEY`** and **`JWT_SECRET_KEY`**; the app refuses to boot with the development placeholders when production mode is enabled.
+
 ---
 
 ## 3. Start the API server

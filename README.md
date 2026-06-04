@@ -1,5 +1,9 @@
 # CursorAI Module 7 — Team & Support Portal
 
+[![CI/CD](https://github.com/fleurcodes/cursorAI-module8-cteran/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/fleurcodes/cursorAI-module8-cteran/actions/workflows/ci-cd.yml)
+[![CodeQL](https://github.com/fleurcodes/cursorAI-module8-cteran/actions/workflows/codeql.yml/badge.svg)](https://github.com/fleurcodes/cursorAI-module8-cteran/actions/workflows/codeql.yml)
+[![Backend coverage gate](https://img.shields.io/badge/backend%20coverage-%E2%89%A566%25-blue)](docs/CODEBASE_AUDIT_INTEGRATION.md)
+
 A full-stack demo: **React + TypeScript + Vite** on the front end and a **Flask** API with JWT authentication, team project/task features, and a **customer support** area (tickets, agents, admin metrics). The UI uses Tailwind CSS and hash-based routing.
 
 ---

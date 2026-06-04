@@ -1,0 +1,10 @@
+# Optional local dependencies: Redis for Flask-Caching + Celery broker/result backend.
+# Usage: docker compose up -d redis
+# Then export REDIS_URL=redis://127.0.0.1:6379/0 (see RUNNING.md).
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    command: ['redis-server', '--appendonly', 'yes']

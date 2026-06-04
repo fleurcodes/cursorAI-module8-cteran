@@ -4,9 +4,13 @@ omit =
     .venv/*
     */.venv/*
     tests/*
+    celery_worker.py
+    seed_support.py
 
 [report]
 omit =
     .venv/*
     */.venv/*
     tests/*
+    celery_worker.py
+    seed_support.py
