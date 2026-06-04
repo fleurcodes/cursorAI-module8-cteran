@@ -57,7 +57,7 @@ open qa-artifacts/dashboard.html
 
 The script exits **non-zero** if ESLint reports **errors** (warnings alone do not fail), Pylint reports errors, pytest test failures occur, or Playwright fails.
 
-**Coverage gate:** `backend/pytest.ini` enforces **`--cov-fail-under=78`** on the full backend suite (line+branch total; full suite is **~82%**; stretch **~90%**). GitHub Actions job **Backend — full suite + coverage gate** runs the same command and uploads **`backend-coverage-xml`** (`coverage.xml`) for dashboards or Codecov. The QA master script adds **`--cov-fail-under=0`** so `npm run qa:all` can finish and write `backend-coverage.json` for the HTML dashboard while you iterate.
+**Coverage gate:** `backend/pytest.ini` enforces **`--cov-fail-under=90`** on the full backend suite (line+branch combined; full suite is **~90%**). GitHub Actions job **Backend — full suite + coverage gate** runs the same command and uploads **`backend-coverage-xml`** (`coverage.xml`) for dashboards or Codecov. The QA master script adds **`--cov-fail-under=0`** so `npm run qa:all` can finish and write `backend-coverage.json` for the HTML dashboard while you iterate.
 
 ---
 

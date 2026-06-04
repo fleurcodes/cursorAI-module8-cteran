@@ -64,6 +64,31 @@ def test_refresh_sla_flags_sets_response_breach():
     assert t.sla_response_breached is True
 
 
+def test_can_transition_closed_to_reopened_without_closed_at_fails():
+    tk = MagicMock()
+    tk.closed_at = None
+    ok, msg = ticket_logic.can_transition('closed', 'reopened', tk, 'admin')
+    assert ok is False
+    assert msg and 'closed timestamp' in msg.lower()
+
+
+def test_can_transition_customer_may_reopen_from_resolved():
+    tk = MagicMock()
+    ok, msg = ticket_logic.can_transition('resolved', 'reopened', tk, 'customer')
+    assert ok is True
+
+
+def test_refresh_sla_resolution_breach_when_already_escalated():
+    t = MagicMock()
+    t.first_response_at = datetime.utcnow()
+    t.sla_first_response_due = datetime.utcnow() + timedelta(hours=1)
+    t.sla_resolution_due = datetime.utcnow() - timedelta(hours=1)
+    t.status = 'in_progress'
+    t.sla_escalated = True
+    ticket_logic.refresh_sla_flags(t, now=datetime.utcnow())
+    assert t.sla_resolution_breached is True
+
+
 def test_refresh_sla_flags_resolution_breach_sets_escalated():
     t = MagicMock()
     t.first_response_at = datetime.utcnow()

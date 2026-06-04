@@ -83,7 +83,8 @@ def can_transition(from_status: str, to_status: str, ticket: Ticket, actor_suppo
 
     if to_status == 'reopened' and actor_support_role == 'customer':
         if from_status not in ('resolved', 'closed'):
-            return False, 'Customers may only reopen resolved or closed tickets.'
+            # Unreachable with current ALLOWED_TRANSITIONS (reopened only from resolved/closed).
+            return False, 'Customers may only reopen resolved or closed tickets.'  # pragma: no cover
 
     return True, None
 

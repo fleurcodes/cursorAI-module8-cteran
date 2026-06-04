@@ -27,7 +27,7 @@ This document implements the checklist from the module **integration / full-stac
 | **PASS** | Real-time DB writes verified (not only seeded fixtures) | `backend/tests/test_tasks_api.py`, `test_auth.py`, `conftest.py` (`register_user`, `create_project`) create rows via API + SQLAlchemy | — |
 | **PASS** | Background task queue (Celery worker + broker config) | `backend/celery_app.py`, `backend/jobs.py`, `backend/config.py` (`CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND`) | — |
 | **PARTIAL** | Redis caching layer with TTL strategy | `backend/config.py` (`REDIS_URL` → `CACHE_TYPE = 'RedisCache'`, `CACHE_DEFAULT_TIMEOUT`); `docker-compose.yml` + [RUNNING.md](../RUNNING.md) document local Redis | In production set `REDIS_URL` and run Redis. |
-| **PARTIAL** | pytest suite with ≥90% coverage reported | Full-suite **line+branch** coverage is **~82%** (`pytest tests/`); enforced floor **`--cov-fail-under=78`** in `backend/pytest.ini`; CI uploads `coverage.xml`. Tests include `test_support_admin_export_api.py`, `test_email_service_unit.py`, `test_support_notify_unit.py`, `test_support_tickets_crud_api.py` (incl. multipart / upload limits), `test_ticket_logic_unit.py`. | Push past **90%** with remaining support-agent routes and rare SLA branches. |
+| **PASS** | pytest suite with ≥90% coverage reported | Full-suite **line+branch** coverage is **~90%** (`pytest tests/`); enforced floor **`--cov-fail-under=90`** in `backend/pytest.ini`. Tests include `test_ticket_logic_db.py`, `test_support_rbac_unit.py`, `test_support_tickets_edges_api.py`, `test_support_tickets_quick_404s.py`, `test_projects_edges_api.py`, `test_notifications_edges_api.py`, `test_user_profile_edges_api.py`, `test_socketio_handlers.py`, `test_coverage_final_push.py`, `test_models_user_unit.py`, plus existing support/task/auth suites. | Optional **Codecov** + external uptime monitors. |
 
 ### Automated testing
 
@@ -65,7 +65,6 @@ This document implements the checklist from the module **integration / full-stac
 ### Backend
 
 - **PARTIAL** — Redis cache until `REDIS_URL` is set in the runtime environment.
-- **PARTIAL** — Stretch goal **90%** line coverage vs current **~82%** and enforced floor **78%**.
 
 ### Automated testing
 
@@ -81,7 +80,7 @@ This document implements the checklist from the module **integration / full-stac
 
 | Gap | Suggested change |
 | --- | --- |
-| Coverage toward 90% | Add tests for rare `support_admin` CSV branches and ticket multipart error paths; bump `pytest.ini` `--cov-fail-under` toward 82 once stable. |
+| Coverage maintenance | Keep `pytest.ini` `--cov-fail-under=90` aligned with the full suite; add tests when new endpoints ship without coverage. |
 | Redis in dev | `docker compose up -d redis` and `export REDIS_URL=...` (see [RUNNING.md](../RUNNING.md)). |
 | Codecov badge | Upload `backend/coverage.xml` from CI to Codecov; add shields badge to README. |
 | External monitoring | Add health-check URL to an external monitor; forward API logs/metrics to your org standard. |
@@ -90,9 +89,9 @@ This document implements the checklist from the module **integration / full-stac
 
 ## 4. Health score
 
-**26 / 28** checklist rows **PASS**, **2 PARTIAL**, **0 FAIL**.
+**27 / 28** checklist rows **PASS**, **1 PARTIAL**, **0 FAIL**.
 
-**Summary:** Backend coverage is **~82%** with a **78%** CI/local gate; admin export/users routes, email stub/SMTP paths, notification prefs, SLA hooks, ticket CRUD (including multipart, MIME/size checks, admin on-behalf), and `ticket_logic` are covered. Remaining gap is mostly **stretch 90%** polish and optional **external uptime** tooling.
+**Summary:** Backend coverage is **~90%** (line+branch combined) with a **90%** CI/local gate; support tickets (CRUD, filters, uploads, 404 paths), agents, admin exports, user/support profile routes, projects members, notifications, Socket.IO hooks, Celery delay paths, `ticket_logic`, and `support_rbac` are well covered. Remaining **PARTIAL** items are **Redis in production** and **external uptime** tooling.
 
 ---
 
