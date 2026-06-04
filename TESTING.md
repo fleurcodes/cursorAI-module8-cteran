@@ -30,7 +30,7 @@ The app uses **Playwright** for end-to-end (E2E) tests. Tests run against a live
 npm test
 ```
 
-Playwright launches Chromium (desktop), iPad (tablet), and iPhone 14 (mobile). Results are printed to the terminal and an HTML report is generated in `playwright-report/`.
+Playwright launches **Chromium** (desktop), **WebKit** with an iPad profile (tablet), and **WebKit** with an iPhone 14 profile (mobile). Install all engines once with `npx playwright install` (CI installs Chromium + WebKit). Results are printed to the terminal and an HTML report is generated in `playwright-report/`.
 
 ---
 

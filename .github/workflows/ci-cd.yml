@@ -114,13 +114,17 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-      - name: Install Playwright Chromium
+      # Tablet/mobile projects use iPad / iPhone device presets → WebKit (see playwright.config.ts).
+      # Desktop uses Chromium only; install both so all matrix jobs have their browsers.
+      - name: Install Playwright Chromium + WebKit
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium --with-deps
+        run: npx playwright install chromium webkit --with-deps
 
-      - name: Install Playwright system deps (cache hit)
+      - name: Install Playwright browsers + system deps (cache hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: |
+          npx playwright install chromium webkit
+          npx playwright install-deps chromium webkit
 
       - name: Run Playwright (single project)
         run: npx playwright test --project=${{ matrix.project }}
