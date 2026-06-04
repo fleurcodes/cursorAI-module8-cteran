@@ -16,7 +16,7 @@ import {
 import type { MemberRole } from '../components/types/team';
 import type { Project, ProjectStatus } from '../components/types/project';
 import type { Activity } from '../components/types/activity';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 import {
   fetchProjects,
   fetchTeamSummary,
@@ -96,7 +96,9 @@ export default function TeamDashboard() {
   }, []);
 
   useEffect(() => {
-    void loadDashboard();
+    queueMicrotask(() => {
+      void loadDashboard();
+    });
   }, [loadDashboard]);
 
   const members = useMemo(() => {

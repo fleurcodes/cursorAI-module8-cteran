@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { login } from '../services/authService';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 
 /** Shown on the login page for reviewers; same users are created by the API on startup if missing. */
 const REVIEW_DEMO_ACCOUNTS = [

@@ -7,7 +7,7 @@ import {
   fetchTickets,
   updateTicketStatus,
 } from '../services/supportApi';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 
 /** Current status plus valid one-hop targets (mirrors backend/services/ticket_logic.ALLOWED_TRANSITIONS). */
 const TICKET_STATUS_OPTIONS: Record<string, string[]> = {

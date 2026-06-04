@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { TeamMember, MemberRole } from '../types/team';
 
 // ── Shared modal shell ─────────────────────────────────────────────────────
@@ -152,10 +152,6 @@ export function CreateProjectModal({ onClose, onSubmit }: CreateProjectModalProp
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    setSubmitError(null);
-  }, [name, description]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -189,7 +185,10 @@ export function CreateProjectModal({ onClose, onSubmit }: CreateProjectModalProp
             id="project-name"
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setSubmitError(null);
+              setName(e.target.value);
+            }}
             placeholder="e.g. Mobile redesign"
             required
             minLength={3}
@@ -204,7 +203,10 @@ export function CreateProjectModal({ onClose, onSubmit }: CreateProjectModalProp
           <textarea
             id="project-description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setSubmitError(null);
+              setDescription(e.target.value);
+            }}
             placeholder="Short summary (optional)"
             rows={3}
             className={`${inputClass} resize-y min-h-[5rem]`}
@@ -247,10 +249,6 @@ export function AddMemberModal({ onClose, onSubmit }: AddMemberModalProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    setSubmitError(null);
-  }, [name, email, role]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) return;
@@ -284,7 +282,10 @@ export function AddMemberModal({ onClose, onSubmit }: AddMemberModalProps) {
             id="member-name"
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setSubmitError(null);
+              setName(e.target.value);
+            }}
             placeholder="Jane Smith"
             required
             autoFocus
@@ -300,7 +301,10 @@ export function AddMemberModal({ onClose, onSubmit }: AddMemberModalProps) {
             id="member-email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setSubmitError(null);
+              setEmail(e.target.value);
+            }}
             placeholder="jane@example.com"
             required
             className={inputClass}
@@ -314,7 +318,10 @@ export function AddMemberModal({ onClose, onSubmit }: AddMemberModalProps) {
           <select
             id="member-role"
             value={role}
-            onChange={(e) => setRole(e.target.value as MemberRole)}
+            onChange={(e) => {
+              setSubmitError(null);
+              setRole(e.target.value as MemberRole);
+            }}
             className={inputClass}
           >
             {ROLES.map((r) => (

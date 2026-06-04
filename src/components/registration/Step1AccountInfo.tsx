@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Step1Data } from './types';
 import { validateStep1 } from './validators';
 import FormField from './FormField';
@@ -10,13 +10,15 @@ interface Step1Props {
 }
 
 export default function Step1AccountInfo({ data, onChange, onNext }: Step1Props) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const errors = useMemo(() => {
+    if (Object.keys(touched).length === 0) return {};
+    return validateStep1(data).errors;
+  }, [data, touched]);
 
   const handleBlur = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    const result = validateStep1(data);
-    setErrors(result.errors);
   };
 
   const getError = (field: string): string =>
@@ -32,7 +34,6 @@ export default function Step1AccountInfo({ data, onChange, onNext }: Step1Props)
     setTouched(allTouched);
 
     const result = validateStep1(data);
-    setErrors(result.errors);
 
     if (!result.valid) {
       const firstErrorField = ['fullName', 'email', 'password', 'confirmPassword'].find(
@@ -46,14 +47,6 @@ export default function Step1AccountInfo({ data, onChange, onNext }: Step1Props)
     }
     onNext();
   };
-
-  // Re-validate touched fields on data change
-  useEffect(() => {
-    if (Object.keys(touched).length > 0) {
-      const result = validateStep1(data);
-      setErrors(result.errors);
-    }
-  }, [data, touched]);
 
   return (
     <div data-testid="step-1" role="group" aria-labelledby="step1-heading">

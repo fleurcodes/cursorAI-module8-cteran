@@ -9,7 +9,6 @@ import { test, expect } from '@playwright/test';
 import { RegistrationPage } from '../pages/RegistrationPage';
 import {
   validStep1,
-  validStep2,
   INVALID_EMAILS,
   VALID_EMAILS,
   VALID_PASSWORD,

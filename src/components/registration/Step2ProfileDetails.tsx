@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Step2Data } from './types';
 import { validateStep2 } from './validators';
 import FormField from './FormField';
@@ -16,13 +16,15 @@ export default function Step2ProfileDetails({
   onNext,
   onPrevious,
 }: Step2Props) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const errors = useMemo(() => {
+    if (Object.keys(touched).length === 0) return {};
+    return validateStep2(data).errors;
+  }, [data, touched]);
 
   const handleBlur = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    const result = validateStep2(data);
-    setErrors(result.errors);
   };
 
   const getError = (field: string): string =>
@@ -31,7 +33,6 @@ export default function Step2ProfileDetails({
   const handleNext = () => {
     setTouched({ username: true, bio: true });
     const result = validateStep2(data);
-    setErrors(result.errors);
 
     if (!result.valid) {
       const firstErrorField = ['username', 'bio'].find((f) => result.errors[f]);
@@ -43,13 +44,6 @@ export default function Step2ProfileDetails({
     }
     onNext();
   };
-
-  useEffect(() => {
-    if (Object.keys(touched).length > 0) {
-      const result = validateStep2(data);
-      setErrors(result.errors);
-    }
-  }, [data, touched]);
 
   return (
     <div data-testid="step-2" role="group" aria-labelledby="step2-heading">

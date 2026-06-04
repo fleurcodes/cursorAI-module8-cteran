@@ -4,7 +4,8 @@ import RegistrationPage from './pages/RegistrationPage';
 import LoginPage from './pages/LoginPage';
 import TeamDashboard from './pages/TeamDashboard';
 import SupportCenter from './pages/SupportCenter';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './contexts/useAuth';
 
 type Route = '/login' | '/register' | '/team' | '/support';
 

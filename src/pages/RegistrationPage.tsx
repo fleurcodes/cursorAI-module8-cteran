@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import RegistrationForm from '../components/registration/RegistrationForm';
 import type { RegistrationFormData } from '../components/registration/types';
 import { register } from '../services/authService';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/useAuth';
 
 export default function RegistrationPage() {
   const { isAuthenticated, setUser } = useAuth();
