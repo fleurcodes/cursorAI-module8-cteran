@@ -286,7 +286,12 @@ jobs:
           docker rm -f api-active
           docker rm -f api-candidate
           docker run -d --name api-active -p 5000:5000 api:ci
-          curl -fsS "http://127.0.0.1:5000/" >/dev/null
+          echo "Waiting for promoted instance on :5000..."
+          for i in $(seq 1 45); do
+            if curl -fsS "http://127.0.0.1:5000/" >/dev/null 2>&1; then echo "Promoted slot health OK"; break; fi
+            sleep 2
+            if [ "$i" -eq 45 ]; then echo "Promoted slot failed to become healthy"; docker logs api-active; exit 1; fi
+          done
           echo "**Promoted** new revision to active port 5000 (simulated switch)." >> "$GITHUB_STEP_SUMMARY"
 
   notify:
