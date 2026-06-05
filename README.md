@@ -82,6 +82,12 @@ These credentials are for **local and classroom review only**; do not use them i
 
 ---
 
+## Architecture
+
+See **[docs/architecture.md](docs/architecture.md)** for Mermaid diagrams of system context, backend modules, frontend routes, and CI or Docker deployment.
+
+---
+
 ## Quick start
 
 See **[RUNNING.md](RUNNING.md)** for prerequisites, Python venv, starting the API and the Vite dev server, and optional environment variables.
