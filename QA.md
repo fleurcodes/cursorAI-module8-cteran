@@ -55,6 +55,12 @@ Open the dashboard:
 open qa-artifacts/dashboard.html
 ```
 
+For deliverable screenshots, set a subtitle (name / cohort) when regenerating only the HTML:
+
+```bash
+QA_DASHBOARD_SUBTITLE="Module 8 — Your Name" npm run qa:dashboard
+```
+
 The script exits **non-zero** if ESLint reports **errors** (warnings alone do not fail), Pylint reports errors, pytest test failures occur, or Playwright fails.
 
 **Coverage gate:** `backend/pytest.ini` enforces **`--cov-fail-under=90`** on the full backend suite (line+branch combined; full suite is **~90%**). GitHub Actions job **Backend — full suite + coverage gate** runs the same command and uploads **`backend-coverage-xml`** (`coverage.xml`) for dashboards or Codecov. The QA master script adds **`--cov-fail-under=0`** so `npm run qa:all` can finish and write `backend-coverage.json` for the HTML dashboard while you iterate.
@@ -121,7 +127,7 @@ npm run qa:perf
 BASE_URL=http://127.0.0.1:5000 bash scripts/qa/perf-k6.sh
 ```
 
-Script: [perf/k6/api-smoke.js](perf/k6/api-smoke.js) — hits `GET /` with thresholds aligned to **p95 under 500 ms** and **error rate under 1%**.
+Script: [perf/k6/api-smoke.js](perf/k6/api-smoke.js) — hits `GET /health` (exempt from default rate limits) with thresholds aligned to **p95 under 500 ms** and **error rate under 1%**.
 
 ---
 

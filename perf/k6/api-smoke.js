@@ -1,5 +1,6 @@
 /**
- * k6 smoke against the Flask API root (GET /).
+ * k6 smoke against the Flask API health endpoint (GET /health).
+ * Uses /health (not /) so the run stays under global rate limits on discovery routes.
  * Prerequisites: backend running on BASE_URL (default http://127.0.0.1:5000).
  *
  *   k6 run perf/k6/api-smoke.js
@@ -25,13 +26,13 @@ export const options = {
 const base = __ENV.BASE_URL || 'http://127.0.0.1:5000';
 
 export default function () {
-  const res = http.get(`${base.replace(/\/$/, '')}/`);
+  const res = http.get(`${base.replace(/\/$/, '')}/health`);
   const ok = check(res, {
     'status 200': (r) => r.status === 200,
-    'has message': (r) => {
+    'health payload': (r) => {
       try {
         const b = r.json();
-        return b && b.message != null;
+        return b && (b.status === 'ok' || b.message != null);
       } catch {
         return false;
       }

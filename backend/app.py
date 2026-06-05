@@ -101,6 +101,7 @@ def create_app(test_config=None):
 
     @app.route('/health')
     @app.route('/ping')
+    @limiter.exempt
     def health_check():
         """Liveness probe for load balancers and CI deploy smoke tests."""
         return jsonify({'status': 'ok'}), 200

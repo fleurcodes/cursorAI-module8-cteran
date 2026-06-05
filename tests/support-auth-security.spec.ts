@@ -15,7 +15,7 @@ test.describe('Support — access and security (mocked)', () => {
   });
 
   test('shows support-role gate when user has team access but support_role none', async ({ page }) => {
-    const user = defaultRegisteredUser({ id: 80, email: 'teamonly@example.com' });
+    const user = defaultRegisteredUser({ id: 80, email: 'teamonly@example.com', support_role: 'none' });
     await installEmptyDashboardMocks(page);
     await page.route('**/api/login', (route) => {
       if (route.request().method() !== 'POST') return route.continue();
@@ -29,6 +29,9 @@ test.describe('Support — access and security (mocked)', () => {
     const login = new LoginPage(page);
     await login.goto();
     await login.signIn(user.email!, 'Secure@123');
+    await expect(page.getByRole('heading', { name: /Team Dashboard|No projects yet/ })).toBeVisible({
+      timeout: 15_000,
+    });
 
     await page.goto('/#/support');
     await expect(page.getByRole('heading', { name: 'Support access not enabled' })).toBeVisible({

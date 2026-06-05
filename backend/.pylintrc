@@ -1,5 +1,7 @@
 [MAIN]
 ignore=.venv
+# max-complexity is defined by the McCabe extension (cyclomatic complexity).
+load-plugins=pylint.extensions.mccabe
 
 [MESSAGES CONTROL]
 disable=
